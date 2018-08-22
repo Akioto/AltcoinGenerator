@@ -1,6 +1,9 @@
 # Altcoin Generator
 Easiest way to create your own cryptocurrency.
 
+This product is based on [tiagosh/AltcoinGenerator](https://github.com/tiagosh/AltcoinGenerator), made some updates to accept litecoin version 0.16.
+
+
 ## What does this script do?
 
 This script is an experiment to generate new cryptocurrencies (altcoins) based on litecoin.
