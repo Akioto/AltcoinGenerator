@@ -299,7 +299,7 @@ case $1 in
     ;;
     *)
         cat <<EOF
-Usage: $0 (start|stop|remove_nodes|clean_up)
+Usage: $0 (start|reset)
  - start: bootstrap environment, build and run your new coin
  - reset: remove all images and related files
 EOF
