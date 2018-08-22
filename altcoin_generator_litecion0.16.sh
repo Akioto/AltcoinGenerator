@@ -14,27 +14,27 @@
 # CHAIN variable below
 
 # change the following variables to match your new coin
-COIN_NAME="MyCoin"
-COIN_UNIT="MYC"
+COIN_NAME="SovolCoin"
+COIN_UNIT="SVC"
 # 42 million coins at total (litecoin total supply is 84000000)
-TOTAL_SUPPLY=42000000
-MAINNET_PORT="54321"
-TESTNET_PORT="54322"
-PHRASE="Some newspaper headline that describes something that happened today"
+TOTAL_SUPPLY=21000000
+MAINNET_PORT="56743"
+TESTNET_PORT="56744"
+PHRASE="Social Volonteer service is important"
 # First letter of the wallet address. Check https://en.bitcoin.it/wiki/Base58Check_encoding
-PUBKEY_CHAR="20"
+PUBKEY_CHAR="25"
 # number of blocks to wait to be able to spend coinbase UTXO's
 COINBASE_MATURITY=100
 # leave CHAIN empty for main network, -regtest for regression network and -testnet for test network
-CHAIN="-regtest"
+CHAIN=""
 # this is the amount of coins to get as a reward of mining the block of height 1. if not set this will default to 50
 #PREMINED_AMOUNT=10000
 
 # warning: change this to your own pubkey to get the genesis block mining reward
-GENESIS_REWARD_PUBKEY=044e0d4bc823e20e14d66396a64960c993585400c53f1e6decb273f249bfeba0e71f140ffa7316f2cdaaae574e7d72620538c3e7791ae9861dfe84dd2955fc85e8
+GENESIS_REWARD_PUBKEY=04AD1CBC6EE226091EB8ECF84BF0ADD4F77A9D2D91511386D5703DC2AF756E8E110119A91DC86A342C33B6780E880C8B3FD87AA3917C4D403E76E2C026B541DD2D
 
-# dont change the following variables unless you know what you are doing
-LITECOIN_BRANCH=0.14
+#dont change the following variables unless you know what you are doing
+LITECOIN_BRANCH=master
 GENESISHZERO_REPOS=https://github.com/lhartikk/GenesisH0
 LITECOIN_REPOS=https://github.com/litecoin-project/litecoin.git
 LITECOIN_PUB_KEY=040184710fa689ad5023690c80f3a49c8f13f8d45b8c857fbcbc8bc4a8e4d3eb4b10f4d4604fa08dce601aaf0f470216fe1b51850b4acf21b179c45070ac7b03a9
@@ -42,13 +42,13 @@ LITECOIN_MERKLE_HASH=97ddfbbae6be97fd6cdf3e7ca13232a3afff2353e29badfab7f73011edd
 LITECOIN_MAIN_GENESIS_HASH=12a765e31ffd4059bada1e25190f6e98c99d9714d334efa41a195a7e7e04bfe2
 LITECOIN_TEST_GENESIS_HASH=4966625a4b2851d9fdee139e56211a0d88575f59ed816ff5e6a63deb4e3e29a0
 LITECOIN_REGTEST_GENESIS_HASH=530827f38f93b43ed12af0b3ad25a288dc02ed74d6d7857862df51fc56c416f9
-MINIMUM_CHAIN_WORK_MAIN=0x000000000000000000000000000000000000000000000006805c7318ce2736c0
-MINIMUM_CHAIN_WORK_TEST=0x000000000000000000000000000000000000000000000000000000054cb9e7a0
+MINIMUM_CHAIN_WORK_MAIN=0x00000000000000000000000000000000000000000000002ebcfe2dd9eff82666
+MINIMUM_CHAIN_WORK_TEST=0x0000000000000000000000000000000000000000000000000007d006a402163e
 COIN_NAME_LOWER=$(echo $COIN_NAME | tr '[:upper:]' '[:lower:]')
 COIN_NAME_UPPER=$(echo $COIN_NAME | tr '[:lower:]' '[:upper:]')
 DIRNAME=$(dirname $0)
-DOCKER_NETWORK="172.18.0"
-DOCKER_IMAGE_LABEL="newcoin-env"
+#DOCKER_NETWORK="172.18.0"
+DOCKER_IMAGE_LABEL="sovolcoin-env"
 OSVERSION="$(uname -s)"
 
 docker_build_image()
@@ -83,54 +83,16 @@ docker_run()
 {
     mkdir -p $DIRNAME/.ccache
     docker run -v $DIRNAME/GenesisH0:/GenesisH0 -v $DIRNAME/.ccache:/root/.ccache -v $DIRNAME/$COIN_NAME_LOWER:/$COIN_NAME_LOWER $DOCKER_IMAGE_LABEL /bin/bash -c "$1"
+
 }
 
-docker_stop_nodes()
+docker_run_genesis()
 {
-    echo "Stopping all docker nodes"
-    for id in $(docker ps -q -a  -f ancestor=$DOCKER_IMAGE_LABEL); do
-        docker stop $id
-    done
+    mkdir -p $DIRNAME/.ccache
+    docker run -v $DIRNAME/GenesisH0:/GenesisH0 $DOCKER_IMAGE_LABEL /bin/bash -c "$1"
 }
 
-docker_remove_nodes()
-{
-    echo "Removing all docker nodes"
-    for id in $(docker ps -q -a  -f ancestor=$DOCKER_IMAGE_LABEL); do
-        docker rm $id
-    done
-}
-
-docker_create_network()
-{
-    echo "Creating docker network"
-    if ! docker network inspect newcoin &>/dev/null; then
-        docker network create --subnet=$DOCKER_NETWORK.0/16 newcoin
-    fi
-}
-
-docker_remove_network()
-{
-    echo "Removing docker network"
-    docker network rm newcoin
-}
-
-docker_run_node()
-{
-    local NODE_NUMBER=$1
-    local NODE_COMMAND=$2
-    mkdir -p $DIRNAME/miner${NODE_NUMBER}
-    if [ ! -f $DIRNAME/miner${NODE_NUMBER}/$COIN_NAME_LOWER.conf ]; then
-        cat <<EOF > $DIRNAME/miner${NODE_NUMBER}/$COIN_NAME_LOWER.conf
-rpcuser=${COIN_NAME_LOWER}rpc
-rpcpassword=$(cat /dev/urandom | env LC_CTYPE=C tr -dc a-zA-Z0-9 | head -c 32; echo)
-EOF
-    fi
-
-    docker run --net newcoin --ip $DOCKER_NETWORK.${NODE_NUMBER} -v $DIRNAME/miner${NODE_NUMBER}:/root/.$COIN_NAME_LOWER -v $DIRNAME/$COIN_NAME_LOWER:/$COIN_NAME_LOWER $DOCKER_IMAGE_LABEL /bin/bash -c "$NODE_COMMAND"
-}
-
-generate_genesis_block()
+docker_generate_genesis_block()
 {
     if [ ! -d GenesisH0 ]; then
         git clone $GENESISHZERO_REPOS
@@ -180,7 +142,7 @@ generate_genesis_block()
     popd
 }
 
-newcoin_replace_vars()
+docker_newcoin_replace_vars()
 {
     if [ -d $COIN_NAME_LOWER ]; then
         echo "Warning: $COIN_NAME_LOWER already existing. Not replacing any values"
@@ -201,7 +163,7 @@ newcoin_replace_vars()
     pushd $COIN_NAME_LOWER
 
     # first rename all directories
-    for i in $(find . -type d | grep -v "^./.git" | grep litecoin); do 
+    for i in $(find . -type d | grep -v "^./.git" | grep litecoin); do
         git mv $i $(echo $i| $SED "s/litecoin/$COIN_NAME_LOWER/")
     done
 
@@ -241,7 +203,8 @@ newcoin_replace_vars()
     $SED -i "0,/1296688602, 0/s//1296688602, $REGTEST_NONCE/" src/chainparams.cpp
     $SED -i "0,/0x1e0ffff0/s//$BITS/" src/chainparams.cpp
 
-    $SED -i "s,vSeeds.push_back,//vSeeds.push_back,g" src/chainparams.cpp
+    #$SED -i "s,vSeeds.push_back,//vSeeds.push_back,g" src/chainparams.cpp
+    $SED -i "s,vSeeds.emplace_back,//vSeeds.emplace_back,g" src/chainparams.cpp
 
     if [ -n "$PREMINED_AMOUNT" ]; then
         $SED -i "s/CAmount nSubsidy = 50 \* COIN;/if \(nHeight == 1\) return COIN \* $PREMINED_AMOUNT;\n    CAmount nSubsidy = 50 \* COIN;/" src/validation.cpp
@@ -261,21 +224,13 @@ newcoin_replace_vars()
     # bip 66
     $SED -i "s/811879/0/" src/chainparams.cpp
 
-    # TODO: fix checkpoints
+    $SED -i -n -e "/checkpointData = {/{" -e "p" -e ":a" -e "N" -e "/};/!ba" -e "s/.*\n//" -e "}" -e "p" src/chainparams.cpp
+    $SED -i '/checkpointData = {/a\            {{0, uint256S("x0")}}' src/chainparams.cpp
+    $SED -i -n -e "/chainTxData = ChainTxData/{" -e "p" -e ":a" -e "N" -e "/};/!ba" -e "s/.*\n//" -e "}" -e "p"  src/chainparams.cpp
+    $SED -i '/chainTxData = ChainTxData/a\            0,0,0' src/chainparams.cpp
+
     popd
 }
-
-build_new_coin()
-{
-    # only run autogen.sh/configure if not done previously
-    if [ ! -e $COIN_NAME_LOWER/Makefile ]; then
-        docker_run "cd /$COIN_NAME_LOWER ; bash  /$COIN_NAME_LOWER/autogen.sh"
-        docker_run "cd /$COIN_NAME_LOWER ; bash  /$COIN_NAME_LOWER/configure"
-    fi
-    # always build as the user could have manually changed some files
-    docker_run "cd /$COIN_NAME_LOWER ; make -j2"
-}
-
 
 if [ $DIRNAME =  "." ]; then
     DIRNAME=$PWD
@@ -303,7 +258,6 @@ case $OSVERSION in
     ;;
 esac
 
-
 if ! which docker &>/dev/null; then
     echo Please install docker first
     exit 1
@@ -315,57 +269,22 @@ if ! which git &>/dev/null; then
 fi
 
 case $1 in
-    stop)
-        docker_stop_nodes
-    ;;
-    remove_nodes)
-        docker_stop_nodes
-        docker_remove_nodes
-    ;;
-    clean_up)
-        docker_stop_nodes
-        for i in $(seq 2 5); do
-           docker_run_node $i "rm -rf /$COIN_NAME_LOWER /root/.$COIN_NAME_LOWER" &>/dev/null
-        done
-        docker_remove_nodes
-        docker_remove_network
-        rm -rf $COIN_NAME_LOWER
-        if [ "$2" != "keep_genesis_block" ]; then
-            rm -f GenesisH0/${COIN_NAME}-*.txt
-        fi
-        for i in $(seq 2 5); do
-           rm -rf miner$i
-        done
-    ;;
     start)
-        if [ -n "$(docker ps -q -f ancestor=$DOCKER_IMAGE_LABEL)" ]; then
-            echo "There are nodes running. Please stop them first with: $0 stop"
-            exit 1
-        fi
-        docker_build_image
-        generate_genesis_block
-        newcoin_replace_vars
-        build_new_coin
-        docker_create_network
+	docker_build_image
+	docker_generate_genesis_block
+	docker_newcoin_replace_vars
 
-        docker_run_node 2 "cd /$COIN_NAME_LOWER ; ./src/${COIN_NAME_LOWER}d $CHAIN -listen -noconnect -bind=$DOCKER_NETWORK.2 -addnode=$DOCKER_NETWORK.1 -addnode=$DOCKER_NETWORK.3 -addnode=$DOCKER_NETWORK.4 -addnode=$DOCKER_NETWORK.5" &
-        docker_run_node 3 "cd /$COIN_NAME_LOWER ; ./src/${COIN_NAME_LOWER}d $CHAIN -listen -noconnect -bind=$DOCKER_NETWORK.3 -addnode=$DOCKER_NETWORK.1 -addnode=$DOCKER_NETWORK.2 -addnode=$DOCKER_NETWORK.4 -addnode=$DOCKER_NETWORK.5" &
-        docker_run_node 4 "cd /$COIN_NAME_LOWER ; ./src/${COIN_NAME_LOWER}d $CHAIN -listen -noconnect -bind=$DOCKER_NETWORK.4 -addnode=$DOCKER_NETWORK.1 -addnode=$DOCKER_NETWORK.2 -addnode=$DOCKER_NETWORK.3 -addnode=$DOCKER_NETWORK.5" &
-        docker_run_node 5 "cd /$COIN_NAME_LOWER ; ./src/${COIN_NAME_LOWER}d $CHAIN -listen -noconnect -bind=$DOCKER_NETWORK.5 -addnode=$DOCKER_NETWORK.1 -addnode=$DOCKER_NETWORK.2 -addnode=$DOCKER_NETWORK.3 -addnode=$DOCKER_NETWORK.4" &
-
-        echo "Docker containers should be up and running now. You may run the following command to check the network status:
-for i in \$(docker ps -q); do docker exec \$i /$COIN_NAME_LOWER/src/${COIN_NAME_LOWER}-cli $CHAIN getinfo; done"
-        echo "To ask the nodes to mine some blocks simply run:
-for i in \$(docker ps -q); do docker exec \$i /$COIN_NAME_LOWER/src/${COIN_NAME_LOWER}-cli $CHAIN generate 2  & done"
-        exit 1
+        exit 0
+    ;;
+    reset)
+        echo "to be inplemented"
     ;;
     *)
         cat <<EOF
 Usage: $0 (start|stop|remove_nodes|clean_up)
  - start: bootstrap environment, build and run your new coin
- - stop: simply stop the containers without removing them
- - remove_nodes: remove the old docker container images. This will stop them first if necessary.
- - clean_up: WARNING: this will stop and remove docker containers and network, source code, genesis block information and nodes data directory. (to start from scratch)
+ - reset: remove all images and related files
 EOF
     ;;
 esac
+
