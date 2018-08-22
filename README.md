@@ -35,13 +35,12 @@ The script will perform a couple of actions:
   * Clone litecoin
   * Rename files and replace variables in litecoin code (genesis hashes, merkle tree hashes, tcp ports, coin name, supply...)
   * Build your new coin
-  * Run 4 docker nodes with your coin daemon and connect each other.
-    * A directory mapped for each node will be created: miner2, miner3, miner4, miner5. They contain data and configuration of each independent node.
   * The GENESIS_REWARD_PUBKEY will be used in the UTXO of the genesis block. If you don't change it to your own before mining the genesis block you are agreeing to pay me the genesis block reward in case your coin succeeds (Thanks! :p)
   
 ## What can I do next?
 
 You can first check if your nodes are running and then ask them to generate some blocks.
+
 Instructions on how to do it will be printed once the script execution is done.
 
 ## Is there anything I must be aware of?
@@ -50,21 +49,17 @@ Yes.
 
   * This is a very simple script to help you bootstrap. More changes will be needed to launch a cryptocurrency for real.
   * You have to manually change the pictures in mycoin/share/pixmaps.
-  * You will need change the checkpoints in mycoin/src/chainparams.cpp.
   * Consider adding a seed node and add it to src/chainparams.cpp as well.
     * Currently all seeds are getting disabled.
-  * The script connects to the regression test network by default. This is a special network that will let you mine new blocks almost instantly (nice for testing). To launch the nodes in the main network, simply leave the CHAIN variable empty.
+  
   
 ## I think something went wrong!
 
 Then you can clean up the mess with:
 
 ```
-bash altcoin_generator.sh clean_up
+bash altcoin_generator.sh reset
 ```
+All files will be removed, and You can simply start again!
 
-## Can I help the project?
-Sure. You can either submit patches, or make a donation if you found this project useful:
 
-LTC: Lcaey9FP2zdu4C9TSVffDG1DuKh78yCDYT
-BTC: 1BB44xSWSHwgM2AMP7MScqk2CALuo6A6UY
