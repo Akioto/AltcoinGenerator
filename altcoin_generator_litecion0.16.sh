@@ -232,6 +232,21 @@ docker_newcoin_replace_vars()
     popd
 }
 
+reset_environment()
+{
+    if [ -d GenesisH0 ]; then
+        rm -rf GenesisH0/
+    fi
+
+    if [ -d litecoin-master ]; then
+        rm -rf litecoin-master/
+    fi
+
+    if [ -d $COIN_NAME_LOWER ]; then
+        rm -rf $COIN_NAME_LOWER/
+    fi
+}
+
 if [ $DIRNAME =  "." ]; then
     DIRNAME=$PWD
 fi
@@ -274,10 +289,13 @@ case $1 in
 	docker_generate_genesis_block
 	docker_newcoin_replace_vars
 
-        exit 0
+    exit 0
     ;;
     reset)
-        echo "to be inplemented"
+    reset_environment
+
+    exit 0
+
     ;;
     *)
         cat <<EOF
