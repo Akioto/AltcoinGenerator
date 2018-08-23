@@ -16,8 +16,8 @@
 # change the following variables to match your new coin
 COIN_NAME="SovolCoin"
 COIN_UNIT="SVC"
-COIN_UNIT_DENOMINATION_1="sovols"
-COIN_UNIT_DENOMINATION_2="vols"
+COIN_UNIT_DENOMINATION_1="TYVM"
+COIN_UNIT_DENOMINATION_2="YW"
 # 42 million coins at total (litecoin total supply is 84000000)
 TOTAL_SUPPLY=21000000
 MAINNET_PORT="56743"
