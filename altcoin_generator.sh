@@ -211,9 +211,13 @@ docker_newcoin_replace_vars()
     $SED -i "0,/293345/s//$TEST_NONCE/" src/chainparams.cpp
     $SED -i "0,/1296688602, 0/s//1296688602, $REGTEST_NONCE/" src/chainparams.cpp
     $SED -i "0,/0x1e0ffff0/s//$BITS/" src/chainparams.cpp
-
-    #$SED -i "s,vSeeds.push_back,//vSeeds.push_back,g" src/chainparams.cpp
+    
+    #comment out dnsseeds
     $SED -i "s,vSeeds.emplace_back,//vSeeds.emplace_back,g" src/chainparams.cpp
+
+    #comment out seednodes
+    $SED -i -e "/static SeedSpec6 pnSeed6_main\[\] = {/{" -e ":a" -e "N" -e "/};/!ba" -e "s/.*//" -e "}" src/chainparamsseeds.h
+    $SED -i -e "/static SeedSpec6 pnSeed6_test\[\] = {/{" -e ":a" -e "N" -e "/};/!ba" -e "s/.*//" -e "}" src/chainparamsseeds.h     
 
     if [ -n "$PREMINED_AMOUNT" ]; then
         $SED -i "s/CAmount nSubsidy = 50 \* COIN;/if \(nHeight == 1\) return COIN \* $PREMINED_AMOUNT;\n    CAmount nSubsidy = 50 \* COIN;/" src/validation.cpp
