@@ -16,6 +16,8 @@
 # change the following variables to match your new coin
 COIN_NAME="SovolCoin"
 COIN_UNIT="SVC"
+COIN_UNIT_DENOMINATION_1="sovols"
+COIN_UNIT_DENOMINATION_2="msovols"
 # 42 million coins at total (litecoin total supply is 84000000)
 TOTAL_SUPPLY=21000000
 MAINNET_PORT="56743"
@@ -178,6 +180,8 @@ docker_newcoin_replace_vars()
         $SED -i "s/litecoin/$COIN_NAME_LOWER/g" $i
         $SED -i "s/LITECOIN/$COIN_NAME_UPPER/g" $i
         $SED -i "s/LTC/$COIN_UNIT/g" $i
+        $SED -i "s/lites/$COIN_UNIT_DENOMINATION1/g" $i
+        $SED -i "s/photons/$COIN_UNIT_DENOMINATION2/g" $i
     done
 
     $SED -i "s/84000000/$TOTAL_SUPPLY/" src/amount.h
