@@ -181,8 +181,12 @@ docker_newcoin_replace_vars()
     done
 
     $SED -i "s/84000000/$TOTAL_SUPPLY/" src/amount.h
+
+    #overwrite base58Prefixes
     $SED -i "s/1,48/1,$PUBKEY_CHAR/" src/chainparams.cpp
     $SED -i "s/1,176/1,25/" src/chainparams.cpp
+    $SED -i "/base58Prefixes\[EXT_PUBLIC_KEY\] =/s/0x04/0xff/" src/chainparams.cpp
+    $SED -i "/base58Prefixes\[EXT_SECRET_KEY\] =/s/0x04/0xff/" src/chainparams.cpp
 
     $SED -i "s/1317972665/$TIMESTAMP/" src/chainparams.cpp
 
