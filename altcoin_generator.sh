@@ -182,6 +182,7 @@ docker_newcoin_replace_vars()
 
     $SED -i "s/84000000/$TOTAL_SUPPLY/" src/amount.h
     $SED -i "s/1,48/1,$PUBKEY_CHAR/" src/chainparams.cpp
+    $SED -i "s/1,176/1,25/" src/chainparams.cpp
 
     $SED -i "s/1317972665/$TIMESTAMP/" src/chainparams.cpp
 
@@ -231,7 +232,6 @@ docker_newcoin_replace_vars()
     $SED -i '/chainTxData = ChainTxData/a\            0,0,0' src/chainparams.cpp
 
     # overwrite pchMessageStart
-
     $SED -i -e '/pchMessageStart\[0\] =/s/0xfd/0x53/g' src/chainparams.cpp
     $SED -i -e '/pchMessageStart\[1\] =/s/0xd2/0x56/g' src/chainparams.cpp
     $SED -i -e '/pchMessageStart\[2\] =/s/0xc8/0x4C/g' src/chainparams.cpp
