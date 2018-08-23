@@ -223,11 +223,19 @@ docker_newcoin_replace_vars()
     $SED -i "s/918684/0/" src/chainparams.cpp
     # bip 66
     $SED -i "s/811879/0/" src/chainparams.cpp
-
+    
+    # reset checkpoint
     $SED -i -n -e "/checkpointData = {/{" -e "p" -e ":a" -e "N" -e "/};/!ba" -e "s/.*\n//" -e "}" -e "p" src/chainparams.cpp
     $SED -i '/checkpointData = {/a\            {{0, uint256S("x0")}}' src/chainparams.cpp
     $SED -i -n -e "/chainTxData = ChainTxData/{" -e "p" -e ":a" -e "N" -e "/};/!ba" -e "s/.*\n//" -e "}" -e "p"  src/chainparams.cpp
     $SED -i '/chainTxData = ChainTxData/a\            0,0,0' src/chainparams.cpp
+
+    # overwrite pchMessageStart
+
+    $SED -i -e '/pchMessageStart\[0\] =/s/0xfd/0x53/g' src/chainparams.cpp
+    $SED -i -e '/pchMessageStart\[1\] =/s/0xd2/0x56/g' src/chainparams.cpp
+    $SED -i -e '/pchMessageStart\[2\] =/s/0xc8/0x4C/g' src/chainparams.cpp
+    $SED -i -e '/pchMessageStart\[3\] =/s/0xf1/0x43/g' src/chainparams.cpp
 
     popd
 }
