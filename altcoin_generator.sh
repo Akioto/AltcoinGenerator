@@ -53,14 +53,17 @@ DOCKER_IMAGE_LABEL="sovolcoin-env"
 OSVERSION="$(uname -s)"
 
 #config file
-CONFIG_FILE_NAME=sovolcoin.conf
-ENABLE_SERVER=1
-RPC_USER=sovol
-PRC_PASSPHRASE=socialvolunteer
-RPC_PORT=59657
+CONFIG_FILE_NAME=lsovolcoin.conf
 ADD_NODE_ADDRESS=203.141.143.8
 ADD_NODE_PORT=56743
 PAY_TX_FEE=0.001
+
+#you must change this if you is gonna RPC_API 
+#ENABLE_SERVER=1
+#RPC_USER=sovol
+#PRC_PASSPHRASE=socialvolunteer
+#RPC_PORT=sovolcoinport
+
 
 docker_build_image()
 {
