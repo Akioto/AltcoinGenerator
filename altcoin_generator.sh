@@ -287,12 +287,12 @@ remove_no_used_files()
 
 reset_environment()
 {
-    if [ -d GenesisH0 ]; then
-        rm -rf GenesisH0/
+    if [ -d "GenesisH0" ]; then
+        rm -rf "GenesisH0/"
     fi
 
-    if [ -d litecoin-master ]; then
-        rm -rf litecoin-master/
+    if [ -d "litecoin-master" ]; then
+        rm -rf "litecoin-master/"
     fi
 
     if [ -d $COIN_NAME_LOWER ]; then
