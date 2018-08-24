@@ -53,8 +53,8 @@ DOCKER_IMAGE_LABEL="sovolcoin-env"
 OSVERSION="$(uname -s)"
 
 #config file
-CONFIG_FILE_NAME = sovolcoin.conf
-ENABLE_SERVER = 1
+CONFIG_FILE_NAME=sovolcoin.conf
+ENABLE_SERVER=1
 RPC_USER=sovol
 PRC_PASSPHRASE=socialvolunteer
 RPC_PORT=59657
