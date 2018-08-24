@@ -277,9 +277,11 @@ generate_config_file()
     fi
 }
 
-remove_noused_files()
+remove_no_used_files()
 {
-
+    if [ -d "litecoin-master" ]; then
+        rm -rf "litecoin-master"
+    fi
 }
 
 
@@ -340,7 +342,7 @@ case $1 in
 	docker_generate_genesis_block
 	docker_newcoin_replace_vars
     generate_config_file
-    #remove_noused_files
+    remove_no_used_files
 
     exit 0
     ;;
