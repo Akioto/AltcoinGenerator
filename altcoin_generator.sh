@@ -218,7 +218,8 @@ docker_newcoin_replace_vars()
     #remove seednodes
     $SED -i -n -e "/static SeedSpec6 pnSeed6_main\[\] = {/{" -e "p" -e ":a" -e "N" -e "/};/!ba" -e "s/.*\n//" -e "}" -e "p" src/chainparamsseeds.h
     $SED -i -n -e "/static SeedSpec6 pnSeed6_test\[\] = {/{" -e "p" -e ":a" -e "N" -e "/};/!ba" -e "s/.*\n//" -e "}" -e "p" src/chainparamsseeds.h
-    $SED -i -e "/static SeedSpec6 pnSeed6_main\[\] = {/a\        {{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0xff,0xcb,0x8d,0x8f,0x08}, 56743}"     
+    $SED -i -e "/static SeedSpec6 pnSeed6_main\[\] = {/a\        {{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0xff,0xcb,0x8d,0x8f,0x08}, 56743}"
+    $SED -i -e "/static SeedSpec6 pnSeed6_test\[\] = {/a\        {{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0xff,0xcb,0x8d,0x8f,0x08}, 56743}"     
 
     if [ -n "$PREMINED_AMOUNT" ]; then
         $SED -i "s/CAmount nSubsidy = 50 \* COIN;/if \(nHeight == 1\) return COIN \* $PREMINED_AMOUNT;\n    CAmount nSubsidy = 50 \* COIN;/" src/validation.cpp
