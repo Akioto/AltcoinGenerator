@@ -37,9 +37,12 @@ The script will perform a couple of actions:
   * Clone GenesisH0 and mine the genesis blocks of main, test and regtest networks in the container (this might take a lot of time)
   * Clone litecoin
   * Rename files and replace variables in litecoin code (genesis hashes, merkle tree hashes, tcp ports, coin name, supply...)
-  * Build your new coin
   * The GENESIS_REWARD_PUBKEY will be used in the UTXO of the genesis block. If you don't change it to your own before mining the genesis block you are agreeing to pay me the genesis block reward in case your coin succeeds (Thanks! :p)
   
+## How to build new coin?
+
+See document for building litecoin.[https://github.com/litecoin-project/litecoin.git]
+
 ## What can I do next?
 
 You can first check if your nodes are running and then ask them to generate some blocks.
