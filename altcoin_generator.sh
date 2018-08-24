@@ -49,9 +49,18 @@ MINIMUM_CHAIN_WORK_TEST=0x0000000000000000000000000000000000000000000000000007d0
 COIN_NAME_LOWER=$(echo $COIN_NAME | tr '[:upper:]' '[:lower:]')
 COIN_NAME_UPPER=$(echo $COIN_NAME | tr '[:lower:]' '[:upper:]')
 DIRNAME=$(dirname $0)
-#DOCKER_NETWORK="172.18.0"
 DOCKER_IMAGE_LABEL="sovolcoin-env"
 OSVERSION="$(uname -s)"
+
+#config file
+CONFIG_FILE_NAME = sovolcoin.conf
+ENABLE_SERVER = 1
+RPC_USER=sovol
+PRC_PASSPHRASE=socialvolunteer
+RPC_PORT=59657
+ADD_NODE_ADDRESS=203.141.143.8
+ADD_NODE_PORT=56743
+PAY_TX_FEE=0.001
 
 docker_build_image()
 {
@@ -259,9 +268,11 @@ generate_config_file()
     if [ -d $COIN_NAME_LOWER ]; then
         pushd $COIN_NAME_LOWER
         touch $COIN_NAME_LOWER/$CONFIG_FILE_NAME
-        echo "addnode=203.141.143.8:56743" >> $COIN_NAME_LOWER/$CONFIG_FILE_NAME
-    
-
+        echo "generating $COIN_NAME_LOWER.conf ..."
+        echo "addnode=$ADD_NODE_ADDRESS:$ADD_NODE_PORT\n\n" \
+             "paytxfee=$PAY_TX_FEE\n\n" \
+             "server=$ENABLE_SERVER\nrpcuser=$RPC_USER\nrpcpassword=$PRC_PASSPHRASE\nrpcport=$RPC_PORT" \
+             >> $COIN_NAME_LOWER/$CONFIG_FILE_NAME
 }
 
 reset_environment()
@@ -320,6 +331,8 @@ case $1 in
 	docker_build_image
 	docker_generate_genesis_block
 	docker_newcoin_replace_vars
+    generate_config_file
+    #remove_nolonger_used_files
 
     exit 0
     ;;
