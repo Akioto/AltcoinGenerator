@@ -273,7 +273,15 @@ generate_config_file()
              "paytxfee=$PAY_TX_FEE\n\n" \
              "server=$ENABLE_SERVER\nrpcuser=$RPC_USER\nrpcpassword=$PRC_PASSPHRASE\nrpcport=$RPC_PORT" \
              >> $COIN_NAME_LOWER/$CONFIG_FILE_NAME
+        popd
+    fi
 }
+
+remove_noused_files()
+{
+
+}
+
 
 reset_environment()
 {
@@ -332,7 +340,7 @@ case $1 in
 	docker_generate_genesis_block
 	docker_newcoin_replace_vars
     generate_config_file
-    #remove_nolonger_used_files
+    #remove_noused_files
 
     exit 0
     ;;
