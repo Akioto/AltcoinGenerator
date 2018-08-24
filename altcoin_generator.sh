@@ -18,17 +18,22 @@ COIN_NAME="SovolCoin"
 COIN_UNIT="SVC"
 COIN_UNIT_DENOMINATION_1="TYVM"
 COIN_UNIT_DENOMINATION_2="YW"
-# 42 million coins at total (litecoin total supply is 84000000)
+
+# 21 million coins at total (litecoin total supply is 84000000)
 TOTAL_SUPPLY=21000000
 MAINNET_PORT="56743"
 TESTNET_PORT="56744"
 PHRASE="Social Volonteer service is important"
+
 # First letter of the wallet address. Check https://en.bitcoin.it/wiki/Base58Check_encoding
 PUBKEY_CHAR="25"
+
 # number of blocks to wait to be able to spend coinbase UTXO's
 COINBASE_MATURITY=100
+
 # leave CHAIN empty for main network, -regtest for regression network and -testnet for test network
 CHAIN=""
+
 # this is the amount of coins to get as a reward of mining the block of height 1. if not set this will default to 50
 #PREMINED_AMOUNT=10000
 
@@ -53,13 +58,13 @@ DOCKER_IMAGE_LABEL="sovolcoin-env"
 OSVERSION="$(uname -s)"
 
 #config file
-CONFIG_FILE_NAME=lsovolcoin.conf
+CONFIG_FILE_NAME=sovolcoin.conf
 ADD_NODE_ADDRESS=203.141.143.8
 ADD_NODE_PORT=56743
 PAY_TX_FEE=0.001
 
 #you must change this if you is gonna RPC_API 
-#ENABLE_SERVER=1
+ENABLE_SERVER=0
 #RPC_USER=sovol
 #PRC_PASSPHRASE=socialvolunteer
 #RPC_PORT=sovolcoinport
@@ -156,7 +161,7 @@ docker_generate_genesis_block()
     popd
 }
 
-docker_newcoin_replace_vars()
+newcoin_replace_vars()
 {
     if [ -d $COIN_NAME_LOWER ]; then
         echo "Warning: $COIN_NAME_LOWER already existing. Not replacing any values"
@@ -198,7 +203,7 @@ docker_newcoin_replace_vars()
 
     $SED -i "s/84000000/$TOTAL_SUPPLY/" src/amount.h
 
-    #overwrite base58Prefixes
+    # overwrite base58Prefixes
     $SED -i "s/1,48/1,$PUBKEY_CHAR/" src/chainparams.cpp
     $SED -i "s/1,176/1,25/" src/chainparams.cpp
     $SED -i "/base58Prefixes\[EXT_PUBLIC_KEY\] =/s/0x04/0xff/" src/chainparams.cpp
@@ -224,12 +229,13 @@ docker_newcoin_replace_vars()
     $SED -i "0,/1296688602, 0/s//1296688602, $REGTEST_NONCE/" src/chainparams.cpp
     $SED -i "0,/0x1e0ffff0/s//$BITS/" src/chainparams.cpp
     
-    #comment out dnsseeds
+    # comment out dnsseeds
     $SED -i "s,vSeeds.emplace_back,//vSeeds.emplace_back,g" src/chainparams.cpp
 
-    #remove seednodes
+    # remove seednodes and add some example seeds 
     $SED -i -n -e "/static SeedSpec6 pnSeed6_main\[\] = {/{" -e "p" -e ":a" -e "N" -e "/};/!ba" -e "s/.*\n//" -e "}" -e "p" src/chainparamsseeds.h
     $SED -i -n -e "/static SeedSpec6 pnSeed6_test\[\] = {/{" -e "p" -e ":a" -e "N" -e "/};/!ba" -e "s/.*\n//" -e "}" -e "p" src/chainparamsseeds.h
+    # when creating your own altcoin, you must change this addresses
     $SED -i -e "/static SeedSpec6 pnSeed6_main\[\] = {/a\        {{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0xff,0xcb,0x8d,0x8f,0x08}, 56743}" src/chainparamsseeds.h 
     $SED -i -e "/static SeedSpec6 pnSeed6_test\[\] = {/a\        {{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0xff,0xcb,0x8d,0x8f,0x08}, 56743}" src/chainparamsseeds.h
 
@@ -268,15 +274,15 @@ docker_newcoin_replace_vars()
 
 generate_config_file()
 {
-    if [ -d $COIN_NAME_LOWER ]; then
-        pushd $COIN_NAME_LOWER
+    if [ -d $COIN_NAME_LOWER && ! -f $COIN_NAME_LOWER/$CONFIG_FILE_NAME ]; then
         touch $COIN_NAME_LOWER/$CONFIG_FILE_NAME
-        echo "generating $COIN_NAME_LOWER.conf ..."
+        echo "generating $CONFIG_FILE_NAME ..."
         echo "addnode=$ADD_NODE_ADDRESS:$ADD_NODE_PORT\n\n" \
-             "paytxfee=$PAY_TX_FEE\n\n" \
+             "paytxfee=$PAY_TX_FEE\n\n" >> $COIN_NAME_LOWER/$CONFIG_FILE_NAME
+        if [ $ENABLE_SERVER ]; then
              "server=$ENABLE_SERVER\nrpcuser=$RPC_USER\nrpcpassword=$PRC_PASSPHRASE\nrpcport=$RPC_PORT" \
              >> $COIN_NAME_LOWER/$CONFIG_FILE_NAME
-        popd
+        fi
     fi
 }
 
@@ -343,7 +349,7 @@ case $1 in
     start)
 	docker_build_image
 	docker_generate_genesis_block
-	docker_newcoin_replace_vars
+	newcoin_replace_vars
     generate_config_file
     remove_no_used_files
 
