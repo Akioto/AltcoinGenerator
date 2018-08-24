@@ -2,3 +2,5 @@ GenesisH0/
 litecoin-master/
 sovolcoin/
 .DS_Store
+sovolcoin.conf
+.gitignore
